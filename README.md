@@ -13,8 +13,8 @@ Let's explain how the application works and then discuss further technical detai
 ### How it works
 
 The application is composed of two smart contracts on chain:
-* the main contract ('app') with app id 660802663
-* the verifier contract ('verifier') with app id 660802607
+* the main contract ('app') with app id 698476007
+* the verifier contract ('verifier') with app id 698475927
 
 We'll discuss in the next section how they were generated, let's focus now on how to use them.
 
@@ -51,11 +51,15 @@ File `setup/setup.go` was run with `go run setup.go` to:
 
 2. Compile the main application smart contract defined in `MainContract.py`, embedding the app id of the deployed verifier, and deploy it to TestNet as well.
 
-
 The main app is defined in `MainContract.py` (let's the lord of programmers be praised for Algokit and python on Algorand :) and makes an inner transaction call to the on-chain verifier to verify the zk proof. The verifier expects a proof and its public inputs and the main app gets the proof from the outer call and builds the public inputs from the passed-in `address` parameter. That's pretty typical in zk application since you generally need to make checks and take actions based on the public inputs.
 
 The proof is saved to file by AlgoPlonk which wraps [gnark](https://github.com/Consensys/gnark) for circuit compilation and proof generation.
 The script in `main.py` reads it from file and passes it to the main app as a `DynamicArray[Bytes32]` where `Bytes32` is a `StaticArray` of 32 `Bytes`.
+
+One last thing: the prover and the verifier need to be follow the exact same protocol, which means that gnark, which we wrap to create the proofs, and AlgoPlonk, which generates the smart contracts verifiers, need to be in sync.
+The current commit uses AlgoPlonk v0.1.5, which wraps gnark v0.10.0.
+
+---
 
 By studying this handful of short files you should get a good sense of how to build and deploy simple zk application on Algorand !
 
